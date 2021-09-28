@@ -120,6 +120,7 @@ contract BLUS is ERC20Burnable, Operator {
     }
 
     function setBurnRate(uint8 rate) external onlyOwner {
+        require(rate<100, "error rate");
         _burnRate = rate;
     }
 
