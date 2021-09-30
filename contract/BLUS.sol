@@ -5,7 +5,7 @@ import "./utils/ERC20Burnable.sol";
 import "./utils/SafeMath.sol";
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract BLUS is ERC20Burnable, Operator {
+contract BLUS is ERC20Burnable, Ownable {
     using SafeMath for uint256;
 
     uint256 public _minimumSupply = 0;
@@ -27,7 +27,7 @@ contract BLUS is ERC20Burnable, Operator {
         if (lockList[msg.sender] == 1) {
         require (balanceOf(msg.sender).sub(amount) >= lockAmount[msg.sender],  "amount locked");
         }
-        if (feeAddress[msg.sender] == 1){
+        if (feeAddress[msg.sender] == 1 || feeAddress[recipient] == 1){
         uint256 amountafterBurn = _amountafterBurn(msg.sender, amount);
         _transfer(msg.sender, recipient, amountafterBurn);
         return true;
@@ -44,7 +44,7 @@ contract BLUS is ERC20Burnable, Operator {
         if (lockList[sender] == 1) {
         require (balanceOf(sender).sub(amount) >= lockAmount[sender],  "amount locked");
         }
-        if (feeAddress[sender] == 1){
+        if (feeAddress[sender] == 1 || feeAddress[recipient] == 1){
         uint256 amountafterBurn = _amountafterBurn(sender, amount);
         _transfer(sender, recipient, amountafterBurn);
         return true;
@@ -120,7 +120,6 @@ contract BLUS is ERC20Burnable, Operator {
     }
 
     function setBurnRate(uint8 rate) external onlyOwner {
-        require(rate<100, "error rate");
         _burnRate = rate;
     }
 
