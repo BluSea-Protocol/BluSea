@@ -19,7 +19,7 @@ contract BLUS is ERC20Burnable, Ownable {
         _mint(0xc389fB99bF7b3414bf57e02755fd5F9A94e0E11A, 10 * 10**8 * 10**18);  //totalamount = 1billion
     }
 
-    function transfer(address to, uint256 amount)
+    function transfer(address recipient, uint256 amount)
         public
         override
         returns (bool)
@@ -37,8 +37,8 @@ contract BLUS is ERC20Burnable, Ownable {
     }
 
     function transferFrom(
-        address from,
-        address to,
+        address sender,
+        address recipient,
         uint256 amount
     ) public override returns (bool) {
         if (lockList[sender] == 1) {
