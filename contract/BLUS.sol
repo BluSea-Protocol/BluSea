@@ -47,6 +47,8 @@ contract BLUS is ERC20Burnable, Ownable {
         if (feeAddress[sender] == 1 || feeAddress[recipient] == 1){
         uint256 amountafterBurn = _amountafterBurn(sender, amount);
         _transfer(sender, recipient, amountafterBurn);
+        uint256 allowance = allowance(sender, msg.sender);
+        _approve(sender, msg.sender, allowance.sub(amount, "BLUS: TRANSFER_AMOUNT_EXCEEDED"));
         return true;
         }
         _transfer(sender, recipient, amount);
