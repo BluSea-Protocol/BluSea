@@ -1,2 +1,2 @@
-# BluSea
-BluSea
+# UniverseProtocol
+Universe protocol

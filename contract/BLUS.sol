@@ -13,10 +13,16 @@ contract BLUS is ERC20Burnable, Ownable {
     mapping(address => uint8) public lockList;
     mapping(address => uint8) public feeAddress;
     mapping(address => uint256) public lockAmount;
-    constructor(string memory name_, string memory symbol_)
+
+    event LockSet(address users, uint8 stats, uint256 amount);
+    event BurnRateSet(uint8 rate);
+    event FeeAddressSet(address addr);
+    event MinimumSupplySet(uint256 reward);
+
+    constructor(string memory name_, string memory symbol_, address addr_, uint256 amount_)
         ERC20(name_, symbol_)
     {
-        _mint(0xc389fB99bF7b3414bf57e02755fd5F9A94e0E11A, 10 * 10**8 * 10**18);  //totalamount = 1billion
+        _mint(addr_, amount_); 
     }
 
     function transfer(address recipient, uint256 amount)
@@ -47,13 +53,13 @@ contract BLUS is ERC20Burnable, Ownable {
         if (feeAddress[sender] == 1 || feeAddress[recipient] == 1){
         uint256 amountafterBurn = _amountafterBurn(sender, amount);
         _transfer(sender, recipient, amountafterBurn);
-        uint256 allowance = allowance(sender, msg.sender);
-        _approve(sender, msg.sender, allowance.sub(amount, "BLUS: TRANSFER_AMOUNT_EXCEEDED"));
+        uint256 allow = allowance(sender, msg.sender);
+        _approve(sender, msg.sender, allow.sub(amount, "BLUS: TRANSFER_AMOUNT_EXCEEDED"));
         return true;
         }
         _transfer(sender, recipient, amount);
-        uint256 allowance = allowance(sender, msg.sender);
-        _approve(sender, msg.sender, allowance.sub(amount, "BLUS: TRANSFER_AMOUNT_EXCEEDED"));
+        uint256 allow = allowance(sender, msg.sender);
+        _approve(sender, msg.sender, allow.sub(amount, "BLUS: TRANSFER_AMOUNT_EXCEEDED"));
         return true;
     }
 
@@ -86,10 +92,6 @@ contract BLUS is ERC20Burnable, Ownable {
     }
 
 
-    function mintToken(address recipient, uint256 amount) onlyOwner external {
-        _mint(recipient, amount);
-        require(totalSupply() <= 10 * 10**8 * 10**18, "BLUS: TOTAL_SUPPLY_EXCEEDED");
-    }
 
     function burn(uint256 amount) public override  {
         super.burn(amount);
@@ -108,24 +110,27 @@ contract BLUS is ERC20Burnable, Ownable {
     {
         lockList[account] = stats;
         lockAmount[account] = amount;
+        emit LockSet(account,stats,amount);
     }
 
     function setFeeAddress(address account, uint8 stats)
         onlyOwner external
     {
         feeAddress[account] = stats;
+        emit FeeAddressSet(account, stats);
     }
 
 
     function setMinimumSupply(uint256 amount) external onlyOwner {
         _minimumSupply = amount;
+        emit MinimumSupplySet(amount);
     }
 
     function setBurnRate(uint8 rate) external onlyOwner {
+        require(rate<=100,"invalid rate!");
         _burnRate = rate;
+        emit BurnRateSet(rate);
     }
-
-
 
 
 }
